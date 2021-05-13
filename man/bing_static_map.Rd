@@ -14,7 +14,7 @@ get_request_url(
   mapsize = c(600, 400),
   zoom = 18,
   orientation = 0,
-  key = Sys.getenv("BING_MAPS_TOKEN")
+  key = Sys.getenv("BING_MAPS_API_KEY")
 )
 
 get_map_image(
@@ -24,7 +24,7 @@ get_map_image(
   mapsize = c(600, 400),
   zoom = 18,
   orientation = 0,
-  key = Sys.getenv("BING_MAPS_TOKEN")
+  key = Sys.getenv("BING_MAPS_API_KEY")
 )
 
 plot_map_image(
@@ -34,7 +34,7 @@ plot_map_image(
   mapsize = c(600, 400),
   zoom = 18,
   orientation = 0,
-  key = Sys.getenv("BING_MAPS_TOKEN")
+  key = Sys.getenv("BING_MAPS_API_KEY")
 )
 }
 \arguments{
@@ -62,7 +62,7 @@ plot_map_image(
 
 \item{orientation}{Character string with orientation  ("N", "E", "S", "W") or numeric direction (0,90,180,270), Default: 0}
 
-\item{key}{Bing Maps API Key, Default: Sys.getenv("BING_MAPS_TOKEN")}
+\item{key}{Bing Maps API Key, Default: Sys.getenv("BING_MAPS_API_KEY")}
 }
 \value{
 get_request_url returns the request URL for the Static Map API

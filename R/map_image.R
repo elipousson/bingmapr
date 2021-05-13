@@ -20,7 +20,7 @@
 #' @param mapsize Numeric vector with width and height in pixels, Default: c(600, 400) 600px wide, 400px high
 #' @param zoom Numeric vector between 0 and 20 for imagery other than Bird's Eye maps or 18 to 22 for Bird's Eye maps. Default: 18
 #' @param orientation Character string with orientation  ("N", "E", "S", "W") or numeric direction (0,90,180,270), Default: 0
-#' @param key Bing Maps API Key, Default: Sys.getenv("BING_MAPS_TOKEN")
+#' @param key Bing Maps API Key, Default: Sys.getenv("BING_MAPS_API_KEY")
 #' @name bing_static_map
 #' @md
 NULL
@@ -35,7 +35,7 @@ get_request_url <- function(location = NULL,
                             mapsize = c(600, 400),
                             zoom = 18,
                             orientation = 0,
-                            key = Sys.getenv("BING_MAPS_TOKEN")) {
+                            key = Sys.getenv("BING_MAPS_API_KEY")) {
   imagery_options <- c("Aerial", "AerialWithLabels", "AerialWithLabelsOnDemand", "Streetside", "BirdsEye", "BirdsEyeWithLabels", "Road", "CanvasDark", "CanvasLight", "CanvasGray")
   imagery <- match.arg(imagery, imagery_options)
 
@@ -102,7 +102,7 @@ get_map_image <- function(location = NULL,
                           mapsize = c(600, 400),
                           zoom = 18,
                           orientation = 0,
-                          key = Sys.getenv("BING_MAPS_TOKEN")) {
+                          key = Sys.getenv("BING_MAPS_API_KEY")) {
   path <- get_request_url(
     location,
     query,
@@ -127,7 +127,7 @@ plot_map_image <- function(location = NULL,
                            mapsize = c(600, 400),
                            zoom = 18,
                            orientation = 0,
-                           key = Sys.getenv("BING_MAPS_TOKEN")) {
+                           key = Sys.getenv("BING_MAPS_API_KEY")) {
   map <- get_map_image(
     location,
     query,
