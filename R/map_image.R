@@ -46,12 +46,8 @@ get_request_url <- function(location = NULL,
   }
 
   if ("sf" %in% class(location)) {
-    location <- location %>%
-      sf::st_centroid() %>%
-      sf::st_transform(4326) %>%
-      sf::st_coordinates() %>%
-      suppressWarnings()
-
+    location <- suppressWarnings(sf::st_centroid(location))
+    location <- sf::st_coordinates(sf::st_transform(location, 4326))
     location <- rev(c(location))
   }
 
