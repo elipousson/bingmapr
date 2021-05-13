@@ -22,27 +22,25 @@
 #' @param orientation Character string with orientation  ("N", "E", "S", "W") or numeric direction (0,90,180,270), Default: 0
 #' @param key Bing Maps API Key, Default: Sys.getenv("BING_MAPS_TOKEN")
 #' @name bing_static_map
-#' @export
 #' @md
 NULL
 
 #' @return get_request_url returns the request URL for the Static Map API
 #' @rdname bing_static_map
 #' @importFrom sf st_centroid st_transform st_coordinates
-#' @importFrom jpeg readJPEG
-#' @importFrom RCurl getURLContent
+#' @importFrom utils URLencode
 get_request_url <- function(location = NULL,
-                         query = NULL,
-                         imagery = "BirdsEye",
-                         mapsize = c(600, 400),
-                         zoom = 18,
-                         orientation = 0,
-                         key = Sys.getenv("BING_MAPS_TOKEN")) {
+                            query = NULL,
+                            imagery = "BirdsEye",
+                            mapsize = c(600, 400),
+                            zoom = 18,
+                            orientation = 0,
+                            key = Sys.getenv("BING_MAPS_TOKEN")) {
   imagery_options <- c("Aerial", "AerialWithLabels", "AerialWithLabelsOnDemand", "Streetside", "BirdsEye", "BirdsEyeWithLabels", "Road", "CanvasDark", "CanvasLight", "CanvasGray")
   imagery <- match.arg(imagery, imagery_options)
 
   if (is.null(location) && is.character(query) && !(imagery %in% imagery_options[5:6])) {
-    location <- URLencode(query)
+    location <- utils::URLencode(query)
   } else if (is.null(location)) {
     stop("location must be provided to use the Bird's Eye imagery types. The query parameter is not supported.")
   }
@@ -68,10 +66,10 @@ get_request_url <- function(location = NULL,
   if (is.character(orientation)) {
     orientation <- match.arg(orientation, c("N", "E", "S", "W"))
     orientation <- switch(orientation,
-                          "N" = 0,
-                          "E" = 90,
-                          "S" = 180,
-                          "W" = 270
+      "N" = 0,
+      "E" = 90,
+      "S" = 180,
+      "W" = 270
     )
   } else {
     orientation <- match.arg(as.character(orientation), c(0, 90, 180, 270))
@@ -82,8 +80,8 @@ get_request_url <- function(location = NULL,
   path <- paste(base, imagery, location, zoom, sep = "/")
 
   orientation <- paste0("dir=", orientation)
-  mapsize <-  paste0("ms=", mapsize)
-  key <-  paste0("key=", key)
+  mapsize <- paste0("ms=", mapsize)
+  key <- paste0("key=", key)
 
   query_string <-
     paste(orientation, mapsize, key, sep = "&")
@@ -92,11 +90,12 @@ get_request_url <- function(location = NULL,
     paste0(path, "?", query_string)
 
   return(path)
-
 }
 
 #' @return get_map_image returns a raster array with JPEG file/content for the map
 #' @rdname bing_static_map
+#' @importFrom jpeg readJPEG
+#' @importFrom RCurl getURLContent
 get_map_image <- function(location = NULL,
                           query = NULL,
                           imagery = "BirdsEye",
@@ -104,30 +103,31 @@ get_map_image <- function(location = NULL,
                           zoom = 18,
                           orientation = 0,
                           key = Sys.getenv("BING_MAPS_TOKEN")) {
-
-  path <- get_request_url(location,
-                          query,
-                          imagery,
-                          mapsize,
-                          zoom,
-                          orientation,
-                          key)
+  path <- get_request_url(
+    location,
+    query,
+    imagery,
+    mapsize,
+    zoom,
+    orientation,
+    key
+  )
 
   map <- jpeg::readJPEG(RCurl::getURLContent(path))
 
   return(map)
-
 }
 
 #' @return plot_map plots the static map image
 #' @rdname bing_static_map
+#' @importFrom graphics rasterImage
 plot_map_image <- function(location = NULL,
-                     query = NULL,
-                     imagery = "BirdsEye",
-                     mapsize = c(600, 400),
-                     zoom = 18,
-                     orientation = 0,
-                     key = Sys.getenv("BING_MAPS_TOKEN")) {
+                           query = NULL,
+                           imagery = "BirdsEye",
+                           mapsize = c(600, 400),
+                           zoom = 18,
+                           orientation = 0,
+                           key = Sys.getenv("BING_MAPS_TOKEN")) {
   map <- get_map_image(
     location,
     query,
@@ -141,5 +141,5 @@ plot_map_image <- function(location = NULL,
   # from https://stackoverflow.com/questions/9543343/plot-a-jpg-image-using-base-graphics-in-r#28729601
   map_res <- dim(map)[2:1] # get the resolution, [x, y]
   plot(1, 1, xlim = c(1, map_res[1]), ylim = c(1, map_res[2]), asp = 1, type = "n", xaxs = "i", yaxs = "i", xaxt = "n", yaxt = "n", xlab = "", ylab = "", bty = "n")
-  rasterImage(map, 1, 1, map_res[1], map_res[2])
+  graphics::rasterImage(map, 1, 1, map_res[1], map_res[2])
 }

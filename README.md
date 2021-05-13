@@ -15,7 +15,7 @@ You can also explore the static map API in the browser using the [Bing Static Ma
 You can install this development version from GitHub with:
 
 ``` r
-# install.packages("devtools")
+# install.packages("remotes")
 remotes::install_github("elipousson/bingmapr")
 ```
 
