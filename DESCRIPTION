@@ -13,6 +13,7 @@ RoxygenNote: 7.1.1
 Imports:
   graphics,
   jpeg,
+  jsonlite,
   RCurl,
   sf,
   utils

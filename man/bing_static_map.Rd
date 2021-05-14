@@ -4,6 +4,7 @@
 \alias{bing_static_map}
 \alias{get_request_url}
 \alias{get_map_image}
+\alias{get_map_meta}
 \alias{plot_map_image}
 \title{Get and plot Bing Static Maps}
 \usage{
@@ -14,7 +15,9 @@ get_request_url(
   mapsize = c(600, 400),
   zoom = 18,
   orientation = 0,
-  key = Sys.getenv("BING_MAPS_API_KEY")
+  nudge = NULL,
+  key = Sys.getenv("BING_MAPS_API_KEY"),
+  check = FALSE
 )
 
 get_map_image(
@@ -24,7 +27,21 @@ get_map_image(
   mapsize = c(600, 400),
   zoom = 18,
   orientation = 0,
-  key = Sys.getenv("BING_MAPS_API_KEY")
+  nudge = NULL,
+  key = Sys.getenv("BING_MAPS_API_KEY"),
+  check = TRUE
+)
+
+get_map_meta(
+  location = NULL,
+  query = NULL,
+  imagery = "BirdsEye",
+  mapsize = c(600, 400),
+  zoom = 18,
+  orientation = 0,
+  nudge = NULL,
+  key = Sys.getenv("BING_MAPS_API_KEY"),
+  bbox = FALSE
 )
 
 plot_map_image(
@@ -34,6 +51,7 @@ plot_map_image(
   mapsize = c(600, 400),
   zoom = 18,
   orientation = 0,
+  nudge = NULL,
   key = Sys.getenv("BING_MAPS_API_KEY")
 )
 }
@@ -56,18 +74,26 @@ plot_map_image(
 \item CanvasGray: A grayscale version of the road maps
 }}
 
-\item{mapsize}{Numeric vector with width and height in pixels, Default: c(600, 400) 600px wide, 400px high}
+\item{mapsize}{Numeric vector with width and height in pixels, Default: c(600, 400) or 600px wide, 400px high}
 
 \item{zoom}{Numeric vector between 0 and 20 for imagery other than Bird's Eye maps or 18 to 22 for Bird's Eye maps. Default: 18}
 
 \item{orientation}{Character string with orientation  ("N", "E", "S", "W") or numeric direction (0,90,180,270), Default: 0}
 
+\item{nudge}{Numeric vector in the format, c(meters to shift latitude, meters to shift longitude), e.g. c(100, 0) to shift center 100 meters in latitude}
+
 \item{key}{Bing Maps API Key, Default: Sys.getenv("BING_MAPS_API_KEY")}
+
+\item{check}{If TRUE, check the map metadata which returns an error if the image is unavailable (Default FALSE for get_request_url and TRUE for get_map_image)}
+
+\item{bbox}{If TRUE, return a bbox class object based on the bounding box values from the map metadata. If FALSE (default), return the full JSON metadata. (get_map_meta only)}
 }
 \value{
 get_request_url returns the request URL for the Static Map API
 
 get_map_image returns a raster array with JPEG file/content for the map
+
+get_map_meta returns the JSON with the map metadata or a bbox for the map area
 
 plot_map plots the static map image
 }
