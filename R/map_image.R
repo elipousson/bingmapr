@@ -33,6 +33,7 @@ NULL
 #' @importFrom sf st_centroid st_transform st_coordinates
 #' @importFrom utils URLencode
 #' @importFrom jsonlite read_json
+#' @export
 get_request_url <- function(location = NULL,
                             query = NULL,
                             imagery = "BirdsEye",
@@ -117,6 +118,7 @@ get_request_url <- function(location = NULL,
 #' @rdname bing_static_map
 #' @importFrom jpeg readJPEG
 #' @importFrom RCurl getURLContent
+#' @export
 get_map_image <- function(location = NULL,
                           query = NULL,
                           imagery = "BirdsEye",
@@ -149,6 +151,7 @@ get_map_image <- function(location = NULL,
 #' @rdname bing_static_map
 #' @importFrom jsonlite read_json
 #' @importFrom sf st_bbox st_crs
+#' @export
 get_map_meta <- function(location = NULL,
                          query = NULL,
                          imagery = "BirdsEye",
@@ -191,6 +194,7 @@ get_map_meta <- function(location = NULL,
 #' @return plot_map plots the static map image
 #' @rdname bing_static_map
 #' @importFrom graphics rasterImage
+#' @export
 plot_map_image <- function(location = NULL,
                            query = NULL,
                            imagery = "BirdsEye",
