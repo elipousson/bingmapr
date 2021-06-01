@@ -30,10 +30,10 @@ NULL
 
 #' @return get_request_url returns the request URL for the Static Map API
 #' @rdname bing_static_map
+#' @export
 #' @importFrom sf st_centroid st_transform st_coordinates
 #' @importFrom utils URLencode
 #' @importFrom jsonlite read_json
-#' @export
 get_request_url <- function(location = NULL,
                             query = NULL,
                             imagery = "BirdsEye",
@@ -116,9 +116,9 @@ get_request_url <- function(location = NULL,
 
 #' @return get_map_image returns a raster array with JPEG file/content for the map
 #' @rdname bing_static_map
+#' @export
 #' @importFrom jpeg readJPEG
 #' @importFrom RCurl getURLContent
-#' @export
 get_map_image <- function(location = NULL,
                           query = NULL,
                           imagery = "BirdsEye",
@@ -149,9 +149,9 @@ get_map_image <- function(location = NULL,
 
 #' @return get_map_meta returns the JSON with the map metadata or a bbox for the map area
 #' @rdname bing_static_map
+#' @export
 #' @importFrom jsonlite read_json
 #' @importFrom sf st_bbox st_crs
-#' @export
 get_map_meta <- function(location = NULL,
                          query = NULL,
                          imagery = "BirdsEye",
@@ -193,8 +193,8 @@ get_map_meta <- function(location = NULL,
 
 #' @return plot_map plots the static map image
 #' @rdname bing_static_map
-#' @importFrom graphics rasterImage
 #' @export
+#' @importFrom graphics rasterImage
 plot_map_image <- function(location = NULL,
                            query = NULL,
                            imagery = "BirdsEye",
