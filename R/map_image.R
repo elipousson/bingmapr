@@ -1,3 +1,7 @@
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage("Use of the Bing Maps APIs is governed by the Microsoft Bing Maps Platform APIs Terms Of Use.\nPlease visit https://www.microsoft.com/en-us/maps/product/ for more information.")
+}
+
 #' Get and plot Bing Static Maps
 #'
 #' See the documentation on Bing Static Maps for reference: https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
