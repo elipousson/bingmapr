@@ -1,32 +1,60 @@
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # bingmapr
 
 <!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/getdata)](https://CRAN.R-project.org/package=getdata)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-bingmapr is an R packge for retrieving and plotting maps from the [Bing Static Maps API](https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map). As of May 2021, I created and plan to use package mainly as a convenient way to access Bing's Bird's Eye (oblique-angle) imagery so the routes and traffic features of the API are all not currently supported.
+bingmapr is an R packge for retrieving and plotting maps from the [Bing
+Static Maps
+API](https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map).
+I created this package in May 2021 primarily to to access Bing’s Bird’s
+Eye (oblique-angle) imagery so the routes and traffic features of the
+API are not currently supported. There are no immediate plans to add
+these features to the package but pull requests are welcome.
 
-This package is inspired by the [snapbox package](https://github.com/anthonynorth/snapbox/) that allows the use of the maps from the Mapbox static map API in ggplot maps. I hope to integrate bingmapr with ggplot in the future.
+This package is inspired by the [snapbox
+package](https://github.com/anthonynorth/snapbox/) that allows the use
+of the maps from the Mapbox static map API in ggplot maps. I hope to
+integrate bingmapr with ggplot in the future.
 
-You can also explore the static map API in the browser using the [Bing Static Map Maker](https://staticmapmaker.com/bing/) made by [Katy DeCorah](https://katydecorah.com/).
+You can also explore the static map API in the browser using the [Bing
+Static Map Maker](https://staticmapmaker.com/bing/) made by [Katy
+DeCorah](https://katydecorah.com/).
 
 ## Installation
 
-You can install this development version from GitHub with:
+You can install the development version of bingmapr from
+[GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("elipousson/bingmapr")
+# install.packages("pak")
+pak::pkg_install("elipousson/bingmapr")
 ```
 
 ## Example
 
+This package requires a Bing Maps API Key which you can get here:
+<https://www.bingmapsportal.com/>
+
 ``` r
-library(bingmapr)
-
-# Get a Bing Maps API Key https://www.bingmapsportal.com/
 bing_maps_api_key(key = "put your key here", install = TRUE)
+```
 
+Here are examples you can run with an installed key:
+
+``` r
 # Get request URL centered on Washington Square Park in New York, NY
 get_request_url(location = c(40.7308349, -73.99746074), orientation = "W")
 
@@ -34,9 +62,8 @@ get_request_url(location = c(40.7308349, -73.99746074), orientation = "W")
 nc <- sf::st_read(system.file("shape/nc.shp", package="sf"))
 
 # Plot a static map showing the center of Wake County, North Carolina
-plot_map_image(location = nc[nc$NAME == "Wake",], orientation = 180)
+get_map_image(location = nc[nc$NAME == "Wake",], orientation = 180)
 
 # Plot static map centered 300 meters north and 500 meters west of the center
-plot_map_image(location = nc[nc$NAME == "Wake",], orientation = 180, nudge = c(300, 500))
+get_map_image(location = nc[nc$NAME == "Wake",], orientation = 180, nudge = c(300, 500))
 ```
-
