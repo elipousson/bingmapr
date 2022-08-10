@@ -2,7 +2,7 @@ pandoc: 2.14.2
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-08-10T18:46Z
+last_built: 2022-08-10T18:49Z
 urls:
   reference: https://elipousson.github.io/bingmapr/reference
   article: https://elipousson.github.io/bingmapr/articles
