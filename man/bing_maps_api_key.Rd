@@ -7,15 +7,19 @@
 bing_maps_api_key(key, overwrite = FALSE, install = FALSE)
 }
 \arguments{
-\item{key}{The API key provided to you from the Bing Maps Dev Center formatted in quotes. A key can be acquired at https://www.bingmapsportal.com/}
+\item{key}{The API key provided to you from the Bing Maps Dev Center
+formatted in quotes. A key can be acquired at
+\url{https://www.bingmapsportal.com/}}
 
-\item{overwrite}{If this is set to TRUE, it will overwrite an existing BING_MAPS_API_KEY that you already have in your .Renviron file.}
+\item{overwrite}{If this is set to \code{TRUE}, it will overwrite an existing
+BING_MAPS_API_KEY that you already have in your .Renviron file.}
 
-\item{install}{if TRUE, will install the key in your .Renviron file for use in future sessions. Defaults to FALSE}
+\item{install}{if \code{TRUE}, will install the key in your .Renviron file for use
+in future sessions. Defaults to \code{FALSE}}
 }
 \description{
 This function will add your CENSUS API key to your .Renviron file so it can
 be called securely without being stored in your code. After you have
 installed your key, it can be called any time by typing
-Sys.getenv("BING_MAPS_API_KEY").
+\code{Sys.getenv("BING_MAPS_API_KEY")}.
 }

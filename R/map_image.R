@@ -4,13 +4,17 @@
 
 #' Get and plot Bing Static Maps
 #'
-#' See the documentation on Bing Static Maps for reference: https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
+#' See the documentation on Bing Static Maps for reference:
+#' https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
 #'
 #' Get API key from https://www.bingmapsportal.com/
 #'
-#' @param location PARAM_DESCRIPTION, sf object (centroid point is used for location) or numeric vector in format c(latitude, longitude)
-#' @param query String with query for location. Ignored if a location is provided.
-#' @param imagery String with imagery type, Default: 'BirdsEye' Supported values include:
+#' @param location A sf object (centroid point is used for location) or numeric
+#'   vector in format c(latitude, longitude)
+#' @param query String with query for location. Ignored if a location is
+#'   provided.
+#' @param imagery String with imagery type, Default: 'BirdsEye' Supported values
+#'   include:
 #' - Aerial: Aerial imagery.
 #' - AerialWithLabels: Aerial imagery with a road overlay.
 #' - AerialWithLabelsOnDemand: Aerial imagery with on-demand road overlay.
@@ -19,15 +23,28 @@
 #' - BirdsEyeWithLabels: Birds Eye (oblique-angle) imagery with a road overlay.
 #' - Road: Roads without additional imagery.
 #' - CanvasDark: A dark version of the road maps.
-#' - CanvasLight: A lighter version of the road maps which also has some of the details such as hill shading disabled.
+#' - CanvasLight: A lighter version of the road maps which also has some of the
+#' details such as hill shading disabled.
 #' - CanvasGray: A grayscale version of the road maps
-#' @param mapsize Numeric vector with width and height in pixels, Default: c(600, 400) or 600px wide, 400px high
-#' @param zoom Numeric vector between 0 and 20 for imagery other than Bird's Eye maps or 18 to 22 for Bird's Eye maps. Default: 18
-#' @param orientation Character string with orientation  ("N", "E", "S", "W") or numeric direction (0,90,180,270), Default: 0
-#' @param nudge Numeric vector in the format, c(meters to shift latitude, meters to shift longitude), e.g. c(100, 0) to shift center 100 meters in latitude
-#' @param bbox If TRUE, return a bbox class object based on the bounding box values from the map metadata. If FALSE (default), return the full JSON metadata. (get_map_meta only)
+#' @param width,height,mapsize Width and height in pixels or use mapsize to
+#'   provide a vector of c(width, height). If mapsize is provided, width and
+#'   height are ignored. Default: 600px wide and 400px high
+#' @param zoom Numeric vector between 0 and 20 for imagery other than Bird's Eye
+#'   maps or 18 to 22 for Bird's Eye maps. Default: 18
+#' @param orientation Orientation as a character string ("N", "E", "S", "W") or
+#'   length 1 numeric vector (0,90,180,270). Other numeric orientations (from
+#'   -360 to 720) are matched to the closest value, e.g. 35 to 0 or 75 to 90.
+#'   Default: 0
+#' @param nudge Numeric vector in the format, c(meters to shift latitude, meters
+#'   to shift longitude), e.g. c(100, 0) to shift center 100 meters in latitude
+#' @param bbox If `TRUE`, return a bbox class object based on the bounding box
+#'   values from the map metadata. If `FALSE` (default), return the full JSON
+#'   metadata. (get_map_meta only)
 #' @param key Bing Maps API Key, Default: Sys.getenv("BING_MAPS_API_KEY")
-#' @param check If TRUE, check the map metadata which returns an error if the image is unavailable (Default FALSE for get_request_url and TRUE for get_map_image)
+#' @param check If `TRUE`, check the map metadata which returns an error if the
+#'   image is unavailable (Default `FALSE` for get_request_url and `TRUE` for
+#'   get_map_image)
+#' @inheritParams magick::image_read
 #' @name bing_static_map
 #' @md
 NULL
@@ -35,49 +52,60 @@ NULL
 #' @return get_request_url returns the request URL for the Static Map API
 #' @rdname bing_static_map
 #' @export
-#' @importFrom sf st_centroid st_transform st_coordinates
 #' @importFrom utils URLencode
 #' @importFrom jsonlite read_json
 get_request_url <- function(location = NULL,
                             query = NULL,
                             imagery = "BirdsEye",
-                            mapsize = c(600, 400),
+                            width = 600,
+                            height = 400,
+                            mapsize = NULL,
                             zoom = 18,
                             orientation = 0,
                             nudge = NULL,
                             key = Sys.getenv("BING_MAPS_API_KEY"),
                             check = FALSE) {
-  imagery_options <- c("Aerial", "AerialWithLabels", "AerialWithLabelsOnDemand", "Streetside", "BirdsEye", "BirdsEyeWithLabels", "Road", "CanvasDark", "CanvasLight", "CanvasGray")
-  imagery <- match.arg(imagery, imagery_options)
+  imagery_options <-
+    c(
+      "Aerial", "AerialWithLabels", "AerialWithLabelsOnDemand",
+      "Streetside",
+      "BirdsEye", "BirdsEyeWithLabels",
+      "Road",
+      "CanvasDark", "CanvasLight", "CanvasGray"
+    )
 
-  if (is.null(location) && is.character(query) && !(imagery %in% imagery_options[5:6])) {
+  imagery <-
+    match.arg(
+      imagery,
+      imagery_options
+    )
+
+  if (is.null(location) &&
+    is.character(query) &&
+    !(imagery %in% imagery_options[5:6])) {
     location <- utils::URLencode(query)
   } else if (is.null(location)) {
-    stop("location must be provided to use the Bird's Eye imagery types. The query parameter is not supported.")
+    stop("location must be provided to use the Bird's Eye imagery types.
+         The query parameter is not supported.")
   }
 
   if ("sf" %in% class(location)) {
-    location <- suppressWarnings(sf::st_centroid(location))
-    location <- sf::st_coordinates(sf::st_transform(location, 4326))
-    location <- rev(c(location))
+    location <- sf_to_coords(location)
   }
 
   if (is.numeric(nudge)) {
-    nudge_lat <- nudge[1]
-    nudge_lon <- nudge[2]
-
-    lat <- location[1]
-    lon <- location[2]
-
-    # from https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
-    # 6371000.0 is approximate radius of the earth in meters
-    new_lat <- lat + (nudge_lat / 6371000.0) * (180 / pi)
-    new_lon <- lon + (nudge_lon / 6371000.0) * (180 / pi) / cos(lat * pi / 180)
-
-    location <- c(new_lat, new_lon)
+    location <- nudge_location(location, nudge)
   }
 
   location <- paste(location, collapse = ",")
+
+  if (is.null(mapsize)) {
+    mapsize <- c(width, height)
+  }
+
+  stopifnot(
+    is.numeric(mapsize) && (length(mapsize) == 2)
+  )
 
   mapsize <- paste(mapsize, collapse = ",")
 
@@ -85,17 +113,32 @@ get_request_url <- function(location = NULL,
     zoom <- 22
   }
 
-  if (is.character(orientation)) {
-    orientation <- match.arg(orientation, c("N", "E", "S", "W"))
-    orientation <- switch(orientation,
+  if (is.numeric(orientation)) {
+    if ((orientation > 360) && (orientation <= 720)) {
+      orientation <- orientation - 360
+    } else if ((orientation < 0) && (orientation >= -360)) {
+      orientation <- 360 + orientation
+    }
+
+    if (orientation <= 45) {
+      orientation <- "N"
+    } else if (orientation <= 135) {
+      orientation <- "E"
+    } else if (orientation <= 225) {
+      orientation <- "S"
+    } else if (orientation <= 360) {
+      orientation <- "W"
+    }
+  }
+
+  orientation <- match.arg(orientation, c("N", "E", "S", "W"))
+  orientation <-
+    switch(orientation,
       "N" = 0,
       "E" = 90,
       "S" = 180,
       "W" = 270
     )
-  } else {
-    orientation <- match.arg(as.character(orientation), c(0, 90, 180, 270))
-  }
 
   base <- "https://dev.virtualearth.net/REST/V1/Imagery/Map"
 
@@ -115,43 +158,47 @@ get_request_url <- function(location = NULL,
     meta <- jsonlite::read_json(paste0(path, "&mapMetadata=1"))
   }
 
-  return(path)
+  path
 }
 
-#' @return get_map_image returns a raster array with JPEG file/content for the map
+#' @return get_map_image returns an image from `magick::image_read`
 #' @rdname bing_static_map
 #' @export
-#' @importFrom jpeg readJPEG
 #' @importFrom RCurl getURLContent
+#' @importFrom magick image_read
 get_map_image <- function(location = NULL,
                           query = NULL,
                           imagery = "BirdsEye",
-                          mapsize = c(600, 400),
+                          width = 600,
+                          height = 400,
+                          mapsize = NULL,
                           zoom = 18,
                           orientation = 0,
                           nudge = NULL,
                           key = Sys.getenv("BING_MAPS_API_KEY"),
-                          check = TRUE) {
+                          check = TRUE,
+                          strip = TRUE) {
+  path <-
+    get_request_url(
+      location = location,
+      query = query,
+      imagery = imagery,
+      width = width,
+      height = height,
+      mapsize = mapsize,
+      zoom = zoom,
+      orientation = orientation,
+      nudge = nudge,
+      key = key,
+      check = check
+    )
 
-  path <- get_request_url(
-    location,
-    query,
-    imagery,
-    mapsize,
-    zoom,
-    orientation,
-    nudge,
-    key,
-    check
-  )
-
-  map <- jpeg::readJPEG(RCurl::getURLContent(path))
-
-  return(map)
+  magick::image_read(RCurl::getURLContent(path), strip = strip)
 }
 
 
-#' @return get_map_meta returns the JSON with the map metadata or a bbox for the map area
+#' @return get_map_meta returns the JSON with the map metadata or a bbox for the
+#'   map area
 #' @rdname bing_static_map
 #' @export
 #' @importFrom jsonlite read_json
@@ -159,22 +206,27 @@ get_map_image <- function(location = NULL,
 get_map_meta <- function(location = NULL,
                          query = NULL,
                          imagery = "BirdsEye",
-                         mapsize = c(600, 400),
+                         width = 600,
+                         height = 400,
+                         mapsize = NULL,
                          zoom = 18,
                          orientation = 0,
                          nudge = NULL,
                          key = Sys.getenv("BING_MAPS_API_KEY"),
                          bbox = FALSE) {
-  path <- get_request_url(
-    location,
-    query,
-    imagery,
-    mapsize,
-    zoom,
-    orientation,
-    nudge,
-    key
-  )
+  path <-
+    get_request_url(
+      location = location,
+      query = query,
+      imagery = imagery,
+      width = width,
+      height = height,
+      mapsize = mapsize,
+      zoom = zoom,
+      orientation = orientation,
+      nudge = nudge,
+      key = key
+    )
 
   meta <- jsonlite::read_json(paste0(path, "&mapMetadata=1"))
 
@@ -190,37 +242,7 @@ get_map_meta <- function(location = NULL,
     )
 
     return(bbox)
-  } else {
-    return(meta)
   }
-}
 
-#' @return plot_map plots the static map image
-#' @rdname bing_static_map
-#' @export
-#' @importFrom graphics rasterImage
-plot_map_image <- function(location = NULL,
-                           query = NULL,
-                           imagery = "BirdsEye",
-                           mapsize = c(600, 400),
-                           zoom = 18,
-                           orientation = 0,
-                           nudge = NULL,
-                           key = Sys.getenv("BING_MAPS_API_KEY")) {
-  map <- get_map_image(
-    location,
-    query,
-    imagery,
-    mapsize,
-    zoom,
-    orientation,
-    nudge,
-    key,
-    check = TRUE
-  )
-
-  # from https://stackoverflow.com/questions/9543343/plot-a-jpg-image-using-base-graphics-in-r#28729601
-  map_res <- dim(map)[2:1] # get the resolution, [x, y]
-  plot(0, 0, xlim = c(0, map_res[1]), ylim = c(0, map_res[2]), asp = 1, type = "n", xaxs = "i", yaxs = "i", xaxt = "n", yaxt = "n", xlab = "", ylab = "", bty = "n")
-  graphics::rasterImage(map, 0, 0, map_res[1], map_res[2])
+  meta
 }

@@ -5,14 +5,15 @@
 \alias{get_request_url}
 \alias{get_map_image}
 \alias{get_map_meta}
-\alias{plot_map_image}
 \title{Get and plot Bing Static Maps}
 \usage{
 get_request_url(
   location = NULL,
   query = NULL,
   imagery = "BirdsEye",
-  mapsize = c(600, 400),
+  width = 600,
+  height = 400,
+  mapsize = NULL,
   zoom = 18,
   orientation = 0,
   nudge = NULL,
@@ -24,43 +25,40 @@ get_map_image(
   location = NULL,
   query = NULL,
   imagery = "BirdsEye",
-  mapsize = c(600, 400),
+  width = 600,
+  height = 400,
+  mapsize = NULL,
   zoom = 18,
   orientation = 0,
   nudge = NULL,
   key = Sys.getenv("BING_MAPS_API_KEY"),
-  check = TRUE
+  check = TRUE,
+  strip = TRUE
 )
 
 get_map_meta(
   location = NULL,
   query = NULL,
   imagery = "BirdsEye",
-  mapsize = c(600, 400),
+  width = 600,
+  height = 400,
+  mapsize = NULL,
   zoom = 18,
   orientation = 0,
   nudge = NULL,
   key = Sys.getenv("BING_MAPS_API_KEY"),
   bbox = FALSE
 )
-
-plot_map_image(
-  location = NULL,
-  query = NULL,
-  imagery = "BirdsEye",
-  mapsize = c(600, 400),
-  zoom = 18,
-  orientation = 0,
-  nudge = NULL,
-  key = Sys.getenv("BING_MAPS_API_KEY")
-)
 }
 \arguments{
-\item{location}{PARAM_DESCRIPTION, sf object (centroid point is used for location) or numeric vector in format c(latitude, longitude)}
+\item{location}{A sf object (centroid point is used for location) or numeric
+vector in format c(latitude, longitude)}
 
-\item{query}{String with query for location. Ignored if a location is provided.}
+\item{query}{String with query for location. Ignored if a location is
+provided.}
 
-\item{imagery}{String with imagery type, Default: 'BirdsEye' Supported values include:
+\item{imagery}{String with imagery type, Default: 'BirdsEye' Supported values
+include:
 \itemize{
 \item Aerial: Aerial imagery.
 \item AerialWithLabels: Aerial imagery with a road overlay.
@@ -70,35 +68,49 @@ plot_map_image(
 \item BirdsEyeWithLabels: Birds Eye (oblique-angle) imagery with a road overlay.
 \item Road: Roads without additional imagery.
 \item CanvasDark: A dark version of the road maps.
-\item CanvasLight: A lighter version of the road maps which also has some of the details such as hill shading disabled.
+\item CanvasLight: A lighter version of the road maps which also has some of the
+details such as hill shading disabled.
 \item CanvasGray: A grayscale version of the road maps
 }}
 
-\item{mapsize}{Numeric vector with width and height in pixels, Default: c(600, 400) or 600px wide, 400px high}
+\item{width, height, mapsize}{Width and height in pixels or use mapsize to
+provide a vector of c(width, height). If mapsize is provided, width and
+height are ignored. Default: 600px wide and 400px high}
 
-\item{zoom}{Numeric vector between 0 and 20 for imagery other than Bird's Eye maps or 18 to 22 for Bird's Eye maps. Default: 18}
+\item{zoom}{Numeric vector between 0 and 20 for imagery other than Bird's Eye
+maps or 18 to 22 for Bird's Eye maps. Default: 18}
 
-\item{orientation}{Character string with orientation  ("N", "E", "S", "W") or numeric direction (0,90,180,270), Default: 0}
+\item{orientation}{Orientation as a character string ("N", "E", "S", "W") or
+length 1 numeric vector (0,90,180,270). Other numeric orientations (from
+-360 to 720) are matched to the closest value, e.g. 35 to 0 or 75 to 90.
+Default: 0}
 
-\item{nudge}{Numeric vector in the format, c(meters to shift latitude, meters to shift longitude), e.g. c(100, 0) to shift center 100 meters in latitude}
+\item{nudge}{Numeric vector in the format, c(meters to shift latitude, meters
+to shift longitude), e.g. c(100, 0) to shift center 100 meters in latitude}
 
 \item{key}{Bing Maps API Key, Default: Sys.getenv("BING_MAPS_API_KEY")}
 
-\item{check}{If TRUE, check the map metadata which returns an error if the image is unavailable (Default FALSE for get_request_url and TRUE for get_map_image)}
+\item{check}{If \code{TRUE}, check the map metadata which returns an error if the
+image is unavailable (Default \code{FALSE} for get_request_url and \code{TRUE} for
+get_map_image)}
 
-\item{bbox}{If TRUE, return a bbox class object based on the bounding box values from the map metadata. If FALSE (default), return the full JSON metadata. (get_map_meta only)}
+\item{strip}{drop image comments and metadata}
+
+\item{bbox}{If \code{TRUE}, return a bbox class object based on the bounding box
+values from the map metadata. If \code{FALSE} (default), return the full JSON
+metadata. (get_map_meta only)}
 }
 \value{
 get_request_url returns the request URL for the Static Map API
 
-get_map_image returns a raster array with JPEG file/content for the map
+get_map_image returns an image from \code{magick::image_read}
 
-get_map_meta returns the JSON with the map metadata or a bbox for the map area
-
-plot_map plots the static map image
+get_map_meta returns the JSON with the map metadata or a bbox for the
+map area
 }
 \description{
-See the documentation on Bing Static Maps for reference: https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
+See the documentation on Bing Static Maps for reference:
+https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
 }
 \details{
 Get API key from https://www.bingmapsportal.com/
