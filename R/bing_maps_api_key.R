@@ -51,6 +51,6 @@ bing_maps_api_key <- function(key, overwrite = FALSE, install = FALSE) {
     return(key)
   } else {
     message("To install your API key for use in future sessions, run this function with `install = TRUE`.")
-    Sys.setenv(BING_MAPS_API_KEY = key)
+    Sys.setenv("BING_MAPS_API_KEY" = key)
   }
 }
