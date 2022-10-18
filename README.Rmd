@@ -52,11 +52,11 @@ Here are examples you can run with an installed key:
 get_request_url(location = c(40.7308349, -73.99746074), orientation = "W")
 
 # Get an sf object to show how bingmapr can use sf objects for locations
-nc <- sf::st_read(system.file("shape/nc.shp", package="sf"))
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"))
 
 # Plot a static map showing the center of Wake County, North Carolina
-get_map_image(location = nc[nc$NAME == "Wake",], orientation = 180)
+get_map_image(location = nc[nc$NAME == "Wake", ], orientation = 180)
 
 # Plot static map centered 300 meters north and 500 meters west of the center
-get_map_image(location = nc[nc$NAME == "Wake",], orientation = 180, nudge = c(300, 500))
+get_map_image(location = nc[nc$NAME == "Wake", ], orientation = 180, nudge = c(300, 500))
 ```
