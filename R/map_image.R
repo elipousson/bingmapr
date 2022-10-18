@@ -101,7 +101,9 @@ get_request_url <- function(location = NULL,
 
   location <- paste(location, collapse = ",")
 
-  if (is.null(mapsize)) {
+  if (!is.null(width) && !is.null(height)) {
+    width <- round(as.numeric(width))
+    height <- round(as.numeric(height))
     mapsize <- c(width, height)
   }
 
@@ -113,6 +115,8 @@ get_request_url <- function(location = NULL,
 
   if (is.null(zoom)) {
     zoom <- 18
+  } else {
+    zoom <- round(as.numeric(zoom))
   }
 
   if ((imagery %in% imagery_options[5:6])) {
