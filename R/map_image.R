@@ -167,6 +167,15 @@ get_request_url <- function(location = NULL,
 
   orientation <- paste0("dir=", orientation)
   mapsize <- paste0("ms=", mapsize)
+
+  if (is.null(key)) {
+    key <- Sys.getenv("BING_MAPS_API_KEY")
+  }
+
+  stopifnot(
+    "A valid Bing Maps API key is required" = is.character(key) && (key != "" )
+  )
+
   key <- paste0("key=", key)
 
   query_string <-
