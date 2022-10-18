@@ -51,11 +51,12 @@ get_map_meta(
 )
 }
 \arguments{
-\item{location}{A sf object (centroid point is used for location) or numeric
-vector in format c(latitude, longitude)}
+\item{location}{A \code{sf}, \code{sfc}, or \code{bbox} object (centroid point is used for
+location) or numeric vector in format \code{c(latitude, longitude)}. Defaults to
+\code{NULL}.}
 
-\item{query}{String with query for location. Ignored if a location is
-provided.}
+\item{query}{String with query for location. query is ignored if a location
+is provided.  Defaults to \code{NULL}.}
 
 \item{imagery}{String with imagery type, Default: 'BirdsEye' Supported values
 include:
@@ -75,7 +76,7 @@ details such as hill shading disabled.
 
 \item{width, height, mapsize}{Width and height in pixels or use mapsize to
 provide a vector of c(width, height). If mapsize is provided, width and
-height are ignored. Default: 600px wide and 400px high}
+height are ignored. Default: 600px width, 400px height, mapsize is \code{NULL}.}
 
 \item{zoom}{Numeric vector between 0 and 20 for imagery other than Bird's Eye
 maps or 18 to 22 for Bird's Eye maps. Default: 18}
@@ -85,20 +86,20 @@ length 1 numeric vector (0,90,180,270). Other numeric orientations (from
 -360 to 720) are matched to the closest value, e.g. 35 to 0 or 75 to 90.
 Default: 0}
 
-\item{nudge}{Numeric vector in the format, c(meters to shift latitude, meters
-to shift longitude), e.g. c(100, 0) to shift center 100 meters in latitude}
+\item{nudge}{Numeric vector in the format, \verb{c(meters to shift latitude, meters to shift longitude)}, e.g. \code{c(100, 0)} to shift center 100 meters in
+latitude.  Defaults to \code{NULL}.}
 
-\item{key}{Bing Maps API Key, Default: Sys.getenv("BING_MAPS_API_KEY")}
+\item{key}{Bing Maps API Key, Default: \code{Sys.getenv("BING_MAPS_API_KEY")}}
 
 \item{check}{If \code{TRUE}, check the map metadata which returns an error if the
-image is unavailable (Default \code{FALSE} for get_request_url and \code{TRUE} for
-get_map_image)}
+image is unavailable (Default \code{FALSE} for \code{\link[=get_request_url]{get_request_url()}} and \code{TRUE}
+for \code{\link[=get_map_image]{get_map_image()}})}
 
 \item{strip}{drop image comments and metadata}
 
-\item{bbox}{If \code{TRUE}, return a bbox class object based on the bounding box
+\item{bbox}{If \code{TRUE}, return a \code{bbox} class object based on the bounding box
 values from the map metadata. If \code{FALSE} (default), return the full JSON
-metadata. (get_map_meta only)}
+metadata. (\code{\link[=get_map_meta]{get_map_meta()}} only)}
 }
 \value{
 get_request_url returns the request URL for the Static Map API
@@ -110,8 +111,8 @@ map area
 }
 \description{
 See the documentation on Bing Static Maps for reference:
-https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
+\url{https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map}
 }
 \details{
-Get API key from https://www.bingmapsportal.com/
+Get API key from \url{https://www.bingmapsportal.com/}
 }

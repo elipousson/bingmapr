@@ -1,7 +1,11 @@
 #' @noRd
-#' @importFrom sf st_centroid st_coordinates st_transform
+#' @importFrom sf st_centroid st_coordinates st_transform st_as_sfc st_union
 sf_to_coords <- function(location) {
-  location <- suppressWarnings(sf::st_centroid(location))
+  if (inherits(location, "bbox")) {
+    location <- sf::st_as_sfc(location)
+  }
+
+  location <- suppressWarnings(sf::st_centroid(sf::st_union(location)))
   location <- sf::st_coordinates(sf::st_transform(location, 4326))
   rev(c(location))
 }

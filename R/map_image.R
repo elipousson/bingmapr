@@ -5,14 +5,15 @@
 #' Get and plot Bing Static Maps
 #'
 #' See the documentation on Bing Static Maps for reference:
-#' https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
+#' <https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map>
 #'
-#' Get API key from https://www.bingmapsportal.com/
+#' Get API key from <https://www.bingmapsportal.com/>
 #'
-#' @param location A sf object (centroid point is used for location) or numeric
-#'   vector in format c(latitude, longitude)
-#' @param query String with query for location. Ignored if a location is
-#'   provided.
+#' @param location A `sf`, `sfc`, or `bbox` object (centroid point is used for
+#'   location) or numeric vector in format `c(latitude, longitude)`. Defaults to
+#'   `NULL`.
+#' @param query String with query for location. query is ignored if a location
+#'   is provided.  Defaults to `NULL`.
 #' @param imagery String with imagery type, Default: 'BirdsEye' Supported values
 #'   include:
 #' - Aerial: Aerial imagery.
@@ -28,22 +29,23 @@
 #' - CanvasGray: A grayscale version of the road maps
 #' @param width,height,mapsize Width and height in pixels or use mapsize to
 #'   provide a vector of c(width, height). If mapsize is provided, width and
-#'   height are ignored. Default: 600px wide and 400px high
+#'   height are ignored. Default: 600px width, 400px height, mapsize is `NULL`.
 #' @param zoom Numeric vector between 0 and 20 for imagery other than Bird's Eye
 #'   maps or 18 to 22 for Bird's Eye maps. Default: 18
 #' @param orientation Orientation as a character string ("N", "E", "S", "W") or
 #'   length 1 numeric vector (0,90,180,270). Other numeric orientations (from
 #'   -360 to 720) are matched to the closest value, e.g. 35 to 0 or 75 to 90.
 #'   Default: 0
-#' @param nudge Numeric vector in the format, c(meters to shift latitude, meters
-#'   to shift longitude), e.g. c(100, 0) to shift center 100 meters in latitude
-#' @param bbox If `TRUE`, return a bbox class object based on the bounding box
+#' @param nudge Numeric vector in the format, `c(meters to shift latitude,
+#'   meters to shift longitude)`, e.g. `c(100, 0)` to shift center 100 meters in
+#'   latitude.  Defaults to `NULL`.
+#' @param bbox If `TRUE`, return a `bbox` class object based on the bounding box
 #'   values from the map metadata. If `FALSE` (default), return the full JSON
-#'   metadata. (get_map_meta only)
-#' @param key Bing Maps API Key, Default: Sys.getenv("BING_MAPS_API_KEY")
+#'   metadata. ([get_map_meta()] only)
+#' @param key Bing Maps API Key, Default: `Sys.getenv("BING_MAPS_API_KEY")`
 #' @param check If `TRUE`, check the map metadata which returns an error if the
-#'   image is unavailable (Default `FALSE` for get_request_url and `TRUE` for
-#'   get_map_image)
+#'   image is unavailable (Default `FALSE` for [get_request_url()] and `TRUE`
+#'   for [get_map_image()])
 #' @inheritParams magick::image_read
 #' @name bing_static_map
 #' @md
@@ -89,7 +91,7 @@ get_request_url <- function(location = NULL,
          The query parameter is not supported.")
   }
 
-  if ("sf" %in% class(location)) {
+  if (inherits(location, c("sfc", "sf", "bbox"))) {
     location <- sf_to_coords(location)
   }
 
