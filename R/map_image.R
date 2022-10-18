@@ -111,8 +111,27 @@ get_request_url <- function(location = NULL,
 
   mapsize <- paste(mapsize, collapse = ",")
 
-  if ((imagery %in% imagery_options[5:6]) && !(zoom %in% c(18:22))) {
-    zoom <- 22
+  if (is.null(zoom)) {
+    zoom <- 18
+  }
+
+  if ((imagery %in% imagery_options[5:6])) {
+    zoom_default <- NULL
+
+    if (zoom < 18) {
+      zoom_default <- 18
+    } else if (zoom > 22) {
+      zoom_default <- 22
+    }
+
+    if (!is.null(zoom_default)) {
+      zoom <- zoom_default
+      warning(
+        paste0(imagery,
+        " imagery only supports zoom levels between 18 and 22.",
+        "\nSetting zoom to ", zoom_default, ".")
+      )
+    }
   }
 
   if (is.numeric(orientation)) {
