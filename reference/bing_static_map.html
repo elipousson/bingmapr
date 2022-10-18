@@ -46,7 +46,7 @@ https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
 
     <div class="ref-description section level2">
     <p>See the documentation on Bing Static Maps for reference:
-https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map</p>
+<a href="https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map" class="external-link">https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map</a></p>
     </div>
 
     <div class="section level2">
@@ -98,13 +98,14 @@ https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-a-static-map
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>location</dt>
-<dd><p>A sf object (centroid point is used for location) or numeric
-vector in format c(latitude, longitude)</p></dd>
+<dd><p>A <code>sf</code>, <code>sfc</code>, or <code>bbox</code> object (centroid point is used for
+location) or numeric vector in format <code>c(latitude, longitude)</code>. Defaults to
+<code>NULL</code>.</p></dd>
 
 
 <dt>query</dt>
-<dd><p>String with query for location. Ignored if a location is
-provided.</p></dd>
+<dd><p>String with query for location. query is ignored if a location
+is provided.  Defaults to <code>NULL</code>.</p></dd>
 
 
 <dt>imagery</dt>
@@ -126,7 +127,7 @@ details such as hill shading disabled.</p></li>
 <dt>width, height, mapsize</dt>
 <dd><p>Width and height in pixels or use mapsize to
 provide a vector of c(width, height). If mapsize is provided, width and
-height are ignored. Default: 600px wide and 400px high</p></dd>
+height are ignored. Default: 600px width, 400px height, mapsize is <code>NULL</code>.</p></dd>
 
 
 <dt>zoom</dt>
@@ -142,18 +143,18 @@ Default: 0</p></dd>
 
 
 <dt>nudge</dt>
-<dd><p>Numeric vector in the format, c(meters to shift latitude, meters
-to shift longitude), e.g. c(100, 0) to shift center 100 meters in latitude</p></dd>
+<dd><p>Numeric vector in the format, <code>c(meters to shift latitude, meters to shift longitude)</code>, e.g. <code>c(100, 0)</code> to shift center 100 meters in
+latitude.  Defaults to <code>NULL</code>.</p></dd>
 
 
 <dt>key</dt>
-<dd><p>Bing Maps API Key, Default: Sys.getenv("BING_MAPS_API_KEY")</p></dd>
+<dd><p>Bing Maps API Key, Default: <code>Sys.getenv("BING_MAPS_API_KEY")</code></p></dd>
 
 
 <dt>check</dt>
 <dd><p>If <code>TRUE</code>, check the map metadata which returns an error if the
-image is unavailable (Default <code>FALSE</code> for get_request_url and <code>TRUE</code> for
-get_map_image)</p></dd>
+image is unavailable (Default <code>FALSE</code> for <code>get_request_url()</code> and <code>TRUE</code>
+for <code>get_map_image()</code>)</p></dd>
 
 
 <dt>strip</dt>
@@ -161,9 +162,9 @@ get_map_image)</p></dd>
 
 
 <dt>bbox</dt>
-<dd><p>If <code>TRUE</code>, return a bbox class object based on the bounding box
+<dd><p>If <code>TRUE</code>, return a <code>bbox</code> class object based on the bounding box
 values from the map metadata. If <code>FALSE</code> (default), return the full JSON
-metadata. (get_map_meta only)</p></dd>
+metadata. (<code>get_map_meta()</code> only)</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -182,7 +183,7 @@ map area</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Get API key from https://www.bingmapsportal.com/</p>
+    <p>Get API key from <a href="https://www.bingmapsportal.com/" class="external-link">https://www.bingmapsportal.com/</a></p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
