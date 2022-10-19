@@ -2,12 +2,13 @@
 % Please edit documentation in R/map_image.R
 \name{bing_static_map}
 \alias{bing_static_map}
+\alias{req_bingmapr}
 \alias{get_request_url}
 \alias{get_map_image}
 \alias{get_map_meta}
 \title{Get and plot Bing Static Maps}
 \usage{
-get_request_url(
+req_bingmapr(
   location = NULL,
   query = NULL,
   imagery = "BirdsEye",
@@ -18,8 +19,12 @@ get_request_url(
   orientation = 0,
   nudge = NULL,
   key = Sys.getenv("BING_MAPS_API_KEY"),
-  check = FALSE
+  check = FALSE,
+  .perform = TRUE,
+  ...
 )
+
+get_request_url(...)
 
 get_map_image(
   location = NULL,
@@ -92,8 +97,12 @@ latitude.  Defaults to \code{NULL}.}
 \item{key}{Bing Maps API Key, Default: \code{Sys.getenv("BING_MAPS_API_KEY")}}
 
 \item{check}{If \code{TRUE}, check the map metadata which returns an error if the
-image is unavailable (Default \code{FALSE} for \code{\link[=get_request_url]{get_request_url()}} and \code{TRUE}
-for \code{\link[=get_map_image]{get_map_image()}})}
+image is unavailable. Default \code{FALSE}.}
+
+\item{.perform}{If \code{TRUE}, return results from \code{\link[httr2:req_perform]{httr2::req_perform()}}. If
+\code{FALSE}, return request.}
+
+\item{...}{Additional parameters passed to \code{\link[httr2:req_url]{httr2::req_url_query()}}}
 
 \item{strip}{drop image comments and metadata}
 

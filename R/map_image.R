@@ -54,7 +54,7 @@ imagery_options <-
 #'   metadata. ([get_map_meta()] only)
 #' @param key Bing Maps API Key, Default: `Sys.getenv("BING_MAPS_API_KEY")`
 #' @param check If `TRUE`, check the map metadata which returns an error if the
-#'   image is unavailable. Default `FALSE`. Not currently supported.
+#'   image is unavailable. Default `FALSE`.
 #' @param .perform If `TRUE`, return results from [httr2::req_perform()]. If
 #'   `FALSE`, return request.
 #' @param ... Additional parameters passed to [httr2::req_url_query()]
