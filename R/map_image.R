@@ -2,6 +2,16 @@
   packageStartupMessage("Use of the Bing Maps APIs is governed by the Microsoft Bing Maps Platform APIs Terms Of Use.\nPlease visit https://www.microsoft.com/en-us/maps/product/ for more information.")
 }
 
+#' @noRd
+imagery_options <-
+  c(
+    "Aerial", "AerialWithLabels", "AerialWithLabelsOnDemand",
+    "Streetside",
+    "BirdsEye", "BirdsEyeWithLabels",
+    "Road",
+    "CanvasDark", "CanvasLight", "CanvasGray"
+  )
+
 #' Get and plot Bing Static Maps
 #'
 #' See the documentation on Bing Static Maps for reference:
@@ -44,8 +54,10 @@
 #'   metadata. ([get_map_meta()] only)
 #' @param key Bing Maps API Key, Default: `Sys.getenv("BING_MAPS_API_KEY")`
 #' @param check If `TRUE`, check the map metadata which returns an error if the
-#'   image is unavailable (Default `FALSE` for [get_request_url()] and `TRUE`
-#'   for [get_map_image()])
+#'   image is unavailable. Default `FALSE`.
+#' @param .perform If `TRUE`, return results from [httr2::req_perform()]. If
+#'   `FALSE`, return request.
+#' @param ... Additional parameters passed to [httr2::req_url_query()]
 #' @inheritParams magick::image_read
 #' @name bing_static_map
 #' @md
@@ -54,26 +66,24 @@ NULL
 #' @return get_request_url returns the request URL for the Static Map API
 #' @rdname bing_static_map
 #' @export
-#' @importFrom utils URLencode
-#' @importFrom jsonlite read_json
-get_request_url <- function(location = NULL,
-                            query = NULL,
-                            imagery = "BirdsEye",
-                            width = 600,
-                            height = 400,
-                            mapsize = NULL,
-                            zoom = 18,
-                            orientation = 0,
-                            nudge = NULL,
-                            key = Sys.getenv("BING_MAPS_API_KEY"),
-                            check = FALSE) {
-  imagery_options <-
-    c(
-      "Aerial", "AerialWithLabels", "AerialWithLabelsOnDemand",
-      "Streetside",
-      "BirdsEye", "BirdsEyeWithLabels",
-      "Road",
-      "CanvasDark", "CanvasLight", "CanvasGray"
+#' @importFrom httr2 request req_url_path_append req_url_query req_user_agent
+#'   req_error resp_body_json req_perform
+req_bingmapr <- function(location = NULL,
+                         query = NULL,
+                         imagery = "BirdsEye",
+                         width = 600,
+                         height = 400,
+                         mapsize = NULL,
+                         zoom = 18,
+                         orientation = 0,
+                         nudge = NULL,
+                         key = Sys.getenv("BING_MAPS_API_KEY"),
+                         check = FALSE,
+                         .perform = TRUE,
+                         ...) {
+  req <-
+    httr2::request(
+      "https://dev.virtualearth.net/REST/V1/Imagery/Map"
     )
 
   imagery <-
@@ -82,123 +92,184 @@ get_request_url <- function(location = NULL,
       imagery_options
     )
 
-  if (is.null(location) &&
-    is.character(query) &&
-    !(imagery %in% imagery_options[5:6])) {
-    location <- utils::URLencode(query)
-  } else if (is.null(location)) {
-    stop("location must be provided to use the Bird's Eye imagery types.
-         The query parameter is not supported.")
+  req <-
+    httr2::req_url_path_append(
+      req,
+      imagery,
+      get_location_or_query(location, query, nudge, imagery),
+      get_zoom_for_imagery(zoom, imagery)
+    )
+
+  req <-
+    httr2::req_url_query(
+      req,
+      dir = get_dir_from_orientation(orientation),
+      ms = get_ms_from_mapsize(width, height, mapsize),
+      key = get_bing_maps_api_key(key),
+      ...
+    )
+
+  req <-
+    httr2::req_user_agent(
+      req,
+      "bingmapr (https://github.com/elipousson/bingmapr)"
+    )
+
+  if (check) {
+    req <-
+      httr2::req_error(
+        req,
+        body = function(resp) {
+          details <- httr2::resp_body_json(resp)$errorDetails[[1]]
+          if (details == "The zoom level is not between 0 and 22, or there is no Birdseye imagery at the specified location.") {
+            return("There is no Birdseye imagery at the specified location.")
+          } else {
+            details
+          }
+        }
+      )
   }
 
-  if (inherits(location, c("sfc", "sf", "bbox"))) {
-    location <- sf_to_coords(location)
+
+  if (!.perform) {
+    return(req)
   }
 
-  if (is.numeric(nudge)) {
-    location <- nudge_location(location, nudge)
+  httr2::req_perform(req)
+}
+
+
+#' Convert numeric or character vector for orientation into dir query parameter
+#' @noRd
+get_location_or_query <- function(location = NULL,
+                                  query = NULL,
+                                  nudge = NULL,
+                                  imagery = NULL) {
+  if (is.null(location)) {
+    if (is.character(query) && !(imagery %in% imagery_options[5:6])) {
+      location <- query
+    } else {
+      stop(
+        paste0(
+          "location must be provided to use the Bird's Eye imagery types.",
+          "\nThe query parameter is not supported."
+        )
+      )
+    }
+  } else {
+    if (inherits(location, c("sfc", "sf", "bbox"))) {
+      location <- sf_to_coords(location)
+    }
+    stopifnot(
+      "location must be a numeric coordinate pair or a sf, sfc, or bbox object." = is.numeric(location)
+    )
+
+    if (is.numeric(nudge)) {
+      location <- nudge_location(location, nudge)
+    }
   }
 
-  location <- paste(location, collapse = ",")
+  paste0(location, collapse = ",")
+}
 
+#' @noRd
+get_ms_from_mapsize <- function(width = NULL,
+                                height = NULL,
+                                mapsize = NULL) {
   if (!is.null(width) && !is.null(height)) {
-    width <- round(as.numeric(width))
-    height <- round(as.numeric(height))
     mapsize <- c(width, height)
   }
+
+  mapsize <- round(as.numeric(mapsize))
 
   stopifnot(
     is.numeric(mapsize) && (length(mapsize) == 2)
   )
 
-  mapsize <- paste(mapsize, collapse = ",")
+  paste(mapsize, collapse = ",")
+}
 
-  if (is.null(zoom)) {
-    zoom <- 18
-  } else {
-    zoom <- round(as.numeric(zoom))
-  }
+#' Convert numeric or character vector for orientation into dir query parameter
+#' @noRd
+get_dir_from_orientation <- function(orientation = NULL) {
+  if (is.character(orientation)) {
+    orientation <-
+      match.arg(orientation, c("N", "E", "S", "W"))
 
-  if ((imagery %in% imagery_options[5:6])) {
-    zoom_default <- NULL
-
-    if (zoom < 18) {
-      zoom_default <- 18
-    } else if (zoom > 22) {
-      zoom_default <- 22
-    }
-
-    if (!is.null(zoom_default)) {
-      zoom <- zoom_default
-      warning(
-        paste0(imagery,
-        " imagery only supports zoom levels between 18 and 22.",
-        "\nSetting zoom to ", zoom_default, ".")
+    orientation <-
+      switch(
+        EXPR = orientation,
+        "N" = 0,
+        "E" = 90,
+        "S" = 180,
+        "W" = 270
       )
-    }
   }
 
-  if (is.numeric(orientation)) {
-    if ((orientation > 360) && (orientation <= 720)) {
-      orientation <- orientation - 360
-    } else if ((orientation < 0) && (orientation >= -360)) {
-      orientation <- 360 + orientation
-    }
-
-    if (orientation <= 45) {
-      orientation <- "N"
-    } else if (orientation <= 135) {
-      orientation <- "E"
-    } else if (orientation <= 225) {
-      orientation <- "S"
-    } else if (orientation <= 360) {
-      orientation <- "W"
-    }
-  }
-
-  orientation <- match.arg(orientation, c("N", "E", "S", "W"))
-  orientation <-
-    switch(orientation,
-      "N" = 0,
-      "E" = 90,
-      "S" = 180,
-      "W" = 270
-    )
-
-  base <- "https://dev.virtualearth.net/REST/V1/Imagery/Map"
-
-  path <- paste(base, imagery, location, zoom, sep = "/")
-
-  orientation <- paste0("dir=", orientation)
-  mapsize <- paste0("ms=", mapsize)
-
-  if (is.null(key)) {
-    key <- Sys.getenv("BING_MAPS_API_KEY")
-  }
-
+  # FIXME: I'm unsure if orientation is required
   stopifnot(
-    "A valid Bing Maps API key is required" = is.character(key) && (key != "" )
+    is.numeric(orientation)
   )
 
-  key <- paste0("key=", key)
-
-  query_string <-
-    paste(orientation, mapsize, key, sep = "&")
-
-  path <-
-    paste0(path, "?", query_string)
-
-  if (check) {
-    meta <- jsonlite::read_json(paste0(path, "&mapMetadata=1"))
+  if (orientation > 360) {
+    orientation <-
+      orientation - (360 * floor(orientation / 360))
+  } else if (orientation < 0) {
+    orientation <-
+      orientation + (360 * ceiling(abs(orientation) / 360))
   }
 
-  path
+  closest_cardinal_dir(orientation)
+}
+
+#' Get zoom query parameter
+#' @noRd
+get_zoom_for_imagery <- function(zoom = NULL, imagery = NULL) {
+  if (is.null(zoom)) {
+    zoom <- 18
+  }
+
+  if (imagery %in% imagery_options[5:6]) {
+    reset_zoom <- NULL
+
+    if (zoom < 18) {
+      reset_zoom <- 18
+    } else if (zoom > 22) {
+      reset_zoom <- 22
+    }
+
+    if (!is.null(reset_zoom)) {
+      zoom <- reset_zoom
+      warning(
+        paste0(
+          imagery,
+          " imagery only supports zoom levels between 18 and 22.",
+          "\nSetting zoom to ", reset_zoom, "."
+        )
+      )
+    }
+  } else if (zoom < 0) {
+    zoom <- 0
+    warning("zoom must be between 0 and 22. Setting zoom to 0.")
+  } else if (zoom > 22) {
+    zoom <- 22
+    warning("zoom must be between 0 and 22. Setting zoom to 22.")
+  }
+
+  round(as.numeric(zoom))
+}
+
+#' @rdname bing_static_map
+#' @name get_request_url
+#' @export
+get_request_url <- function(...) {
+  req_bingmapr(..., .perform = FALSE)$url
 }
 
 #' @return get_map_image returns an image from `magick::image_read`
 #' @rdname bing_static_map
+#' @name get_map_image
 #' @export
-#' @importFrom RCurl getURLContent
 #' @importFrom magick image_read
 get_map_image <- function(location = NULL,
                           query = NULL,
@@ -212,8 +283,8 @@ get_map_image <- function(location = NULL,
                           key = Sys.getenv("BING_MAPS_API_KEY"),
                           check = TRUE,
                           strip = TRUE) {
-  path <-
-    get_request_url(
+  resp <-
+    req_bingmapr(
       location = location,
       query = query,
       imagery = imagery,
@@ -224,10 +295,11 @@ get_map_image <- function(location = NULL,
       orientation = orientation,
       nudge = nudge,
       key = key,
-      check = check
+      check = check,
+      .perform = TRUE
     )
 
-  magick::image_read(RCurl::getURLContent(path), strip = strip)
+  magick::image_read(httr2::resp_body_raw(resp), strip = strip)
 }
 
 
@@ -235,7 +307,7 @@ get_map_image <- function(location = NULL,
 #'   map area
 #' @rdname bing_static_map
 #' @export
-#' @importFrom jsonlite read_json
+#' @importFrom httr2 resp_body_json
 #' @importFrom sf st_bbox st_crs
 get_map_meta <- function(location = NULL,
                          query = NULL,
@@ -248,8 +320,8 @@ get_map_meta <- function(location = NULL,
                          nudge = NULL,
                          key = Sys.getenv("BING_MAPS_API_KEY"),
                          bbox = FALSE) {
-  path <-
-    get_request_url(
+  resp <-
+    req_bingmapr(
       location = location,
       query = query,
       imagery = imagery,
@@ -259,10 +331,12 @@ get_map_meta <- function(location = NULL,
       zoom = zoom,
       orientation = orientation,
       nudge = nudge,
-      key = key
+      key = key,
+      mapMetadata = 1
     )
 
-  meta <- jsonlite::read_json(paste0(path, "&mapMetadata=1"))
+  meta <-
+    httr2::resp_body_json(resp)
 
   if (bbox) {
     bbox <- sf::st_bbox(

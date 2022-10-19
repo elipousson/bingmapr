@@ -54,3 +54,16 @@ bing_maps_api_key <- function(key, overwrite = FALSE, install = FALSE) {
     Sys.setenv("BING_MAPS_API_KEY" = key)
   }
 }
+
+#' @noRd
+get_bing_maps_api_key <- function(key = NULL) {
+  if (is.null(key)) {
+    key <- Sys.getenv("BING_MAPS_API_KEY")
+  }
+
+  stopifnot(
+    "A valid Bing Maps API key is required" = is.character(key) && (key != "")
+  )
+
+  key
+}

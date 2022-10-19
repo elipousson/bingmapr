@@ -23,5 +23,19 @@ nudge_location <- function(location, nudge = NULL) {
   new_lat <- lat + (nudge_lat / 6371000.0) * (180 / pi)
   new_lon <- lon + (nudge_lon / 6371000.0) * (180 / pi) / cos(lat * pi / 180)
 
-  location <- c(new_lat, new_lon)
+  c(new_lat, new_lon)
+}
+
+
+#' Get closest cardinal direction based on angle orientation
+#' @noRd
+closest_cardinal_dir <- function(orientation = NULL) {
+  cardinal_dirs <- c(0, 45, 135, 225, 360)
+
+  cardinal_dirs[
+    findInterval(
+      orientation,
+      cardinal_dirs
+    )
+  ]
 }
