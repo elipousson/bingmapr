@@ -103,9 +103,9 @@ req_bingmapr <- function(location = NULL,
   req <-
     httr2::req_url_query(
       req,
-      dir = get_dir_from_orientation(orientation),
-      ms = get_ms_from_mapsize(width, height, mapsize),
-      key = get_bing_maps_api_key(key),
+      "orientation" = get_orientation(orientation),
+      "ms" = get_ms_from_mapsize(width, height, mapsize),
+      "key" = get_bing_maps_api_key(key),
       ...
     )
 
@@ -129,7 +129,6 @@ req_bingmapr <- function(location = NULL,
         }
       )
   }
-
 
   if (!.perform) {
     return(req)
@@ -191,7 +190,7 @@ get_ms_from_mapsize <- function(width = NULL,
 
 #' Convert numeric or character vector for orientation into dir query parameter
 #' @noRd
-get_dir_from_orientation <- function(orientation = NULL) {
+get_orientation <- function(orientation = NULL) {
   if (is.character(orientation)) {
     orientation <-
       match.arg(orientation, c("N", "E", "S", "W"))
@@ -353,4 +352,18 @@ get_map_meta <- function(location = NULL,
   }
 
   meta
+}
+
+#' Get map image and plot with magick::image_ggplot()
+#'
+#' Wrapper for [magick::image_ggplot()] where all ... parameters are passed to
+#' [get_map_image()].
+#'
+#' @name bingmap_image_ggplot
+#' @inheritDotParams get_map_image
+#' @inheritParams magick::image_ggplot
+#' @export
+#' @importFrom magick image_ggplot
+bingmap_image_ggplot <- function(..., interpolate = FALSE) {
+  magick::image_ggplot(get_map_image(...), interpolate = interpolate)
 }

@@ -86,7 +86,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "22.699KB",
+  "fileSize": "26.905KB",
   "releaseNotes": "https://github.com/elipousson/bingmapr/blob/master/NEWS.md",
   "readme": "https://github.com/elipousson/bingmapr/blob/master/README.md",
   "developmentStatus": ["https://lifecycle.r-lib.org/articles/stages.html#experimental", "https://www.repostatus.org/#active"],
