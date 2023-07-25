@@ -1,5 +1,8 @@
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage("Use of the Bing Maps APIs is governed by the Microsoft Bing Maps Platform APIs Terms Of Use.\nPlease visit https://www.microsoft.com/en-us/maps/product/ for more information.")
+  packageStartupMessage(
+    "Use of the Bing Maps APIs is governed by the Microsoft Bing Maps Platform APIs Terms Of Use.
+    \nMore information: <https://www.microsoft.com/en-us/maps/product/>"
+    )
 }
 
 #' @noRd

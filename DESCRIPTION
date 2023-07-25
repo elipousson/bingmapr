@@ -14,9 +14,12 @@ BugReports: https://github.com/elipousson/bingmapr/issues
 Imports:
     httr2,
     magick,
+    settoken (>= 0.1.0),
     sf,
     utils
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
+Remotes:  
+    elipousson/settoken
