@@ -2,9 +2,21 @@
 % Please edit documentation in R/bing_maps_api_key.R
 \name{bing_maps_api_key}
 \alias{bing_maps_api_key}
+\alias{get_bing_maps_api_key}
 \title{Install a Bing Maps API Key in Your '.Renviron' File for Repeated Use}
 \usage{
-bing_maps_api_key(key, overwrite = FALSE, install = FALSE)
+bing_maps_api_key(
+  key,
+  overwrite = FALSE,
+  install = FALSE,
+  default = "BING_MAPS_API_KEY"
+)
+
+get_bing_maps_api_key(
+  key = NULL,
+  default = "BING_MAPS_API_KEY",
+  call = caller_env()
+)
 }
 \arguments{
 \item{key}{The API key provided to you from the Bing Maps Dev Center
@@ -20,6 +32,5 @@ in future sessions. Defaults to \code{FALSE}}
 \description{
 This function will add your CENSUS API key to your .Renviron file so it can
 be called securely without being stored in your code. After you have
-installed your key, it can be called any time by typing
-\code{Sys.getenv("BING_MAPS_API_KEY")}.
+installed your key, it can be called any time with \code{get_bing_maps_api_key()}.
 }

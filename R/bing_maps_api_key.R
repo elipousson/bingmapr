@@ -18,7 +18,7 @@ bing_maps_api_key <- function(key,
                               overwrite = FALSE,
                               install = FALSE,
                               default = "BING_MAPS_API_KEY") {
-  settoken::set_envvar_token(
+  set_r_environ_token(
     token = key,
     overwrite = overwrite,
     install = install,
@@ -33,7 +33,7 @@ get_bing_maps_api_key <- function(key = NULL,
                                   default = "BING_MAPS_API_KEY",
                                   call = caller_env()) {
 
-  settoken::get_envvar_token(
+  get_r_environ_token(
     token = key,
     default = default,
     message = "{.arg key} is empty and {.arg default} variable {.val {default}} can't be found in {.file .Renviron}",
