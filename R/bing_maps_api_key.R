@@ -32,7 +32,6 @@ bing_maps_api_key <- function(key,
 get_bing_maps_api_key <- function(key = NULL,
                                   default = "BING_MAPS_API_KEY",
                                   call = caller_env()) {
-
   get_r_environ_token(
     token = key,
     default = default,
