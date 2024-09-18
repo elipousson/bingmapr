@@ -19,8 +19,7 @@ Imports:
     sf,
     utils
 Encoding: UTF-8
+Language: en
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
-Remotes: 
-    elipousson/settoken
+RoxygenNote: 7.3.2
